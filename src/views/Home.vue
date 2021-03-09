@@ -6,13 +6,22 @@
       </div>
     </div>
     <div class="main-content">
-      <List v-for="(list, index) in lists" :key="index" :list="list" />
+      <draggable
+          class="drag-wrap"
+        :list="directories"
+          group="directories"
+      >
+        <List class="directory" v-for="(directory, index) in directories" :key="index"
+              :directory="directory"
+              @reloadDirectories="getData"
+        />
+      </draggable>
       <div class="listWrap" ref="addListBtn" @click="createListForm()">
         <i class="el-icon-plus"></i>
         Thêm danh sách khác
       </div>
       <div class="listWrap" id="addWrap" ref="addListWrap">
-        <el-input placeholder="Nhập tiêu đề danh sách..." v-model="listName"></el-input>
+        <el-input placeholder="Nhập tiêu đề danh sách..." v-model="directoryName"></el-input>
         <el-button type="success" class="add-list" @click="createList">Thêm danh sách</el-button>
         <i class="el-icon-close close-add-list" @click="cancelCreateList()"></i>
       </div>
@@ -23,24 +32,28 @@
 <script>
 import List from "@/components/List";
 import { mapState, mapMutations } from 'vuex'
+import api from '../api'
+import draggable from 'vuedraggable'
+
 export default {
   name: 'Home',
   components: {
-    List
+    List,
+    draggable
   },
   data () {
     return {
       dynamicValidateForm: {
-        listName: ''
+        directoryName: ''
       },
-      listName: '',
-      newList: []
+      directoryName: '',
+      newList: [],
+      directories: [],
+      cards: []
     }
   },
   computed: {
-    ...mapState('home', [
-        'lists'
-    ])
+    ...mapState('auth', ['isAuthenticated']),
   },
   methods: {
     ...mapMutations('home', [
@@ -53,25 +66,49 @@ export default {
     cancelCreateList() {
       this.$refs.addListBtn.style.display = 'block'
       this.$refs.addListWrap.style.display = 'none'
-      this.listName = ''
+      this.directoryName = ''
     },
     createList() {
-      if (this.listName != '')
-      {
-        this.newList.push(this.lists.length + 1)
-        this.newList.push(this.listName)
-        this.addList(this.newList)
-        this.cancelCreateList()
-        this.newList = []
+      let data = {
+        title: this.directoryName,
+        index: this.directories.length + 1
       }
-    }
-  }
+      console.log(data)
+      api.createDirectory(data).then(() => {
+        this.$message({
+          message: 'Thêm mới thành công!',
+          type: "success",
+        })
+        this.getData()
+        this.cancelCreateList()
+      }).catch(() => {
+        this.$message({
+          message: 'Thêm mới thất bại!',
+          type: "error"
+        })
+      })
+    },
+    deleteDirectory() {
+      this.getData()
+    },
+    getData() {
+      api.getDirectories().then((response) => {
+        this.directories = response.data.data
+        console.log(this.directories)
+      })
+    },
+  },
+  mounted() {
+    this.getData()
+  },
 }
 </script>
 
 <style lang="scss" scoped>
   .homeWrap {
     height: 95vh;
+    overflow-x: auto;
+    //white-space: nowrap;
     .page-header {
       height: auto;
       overflow: hidden;
@@ -87,6 +124,14 @@ export default {
     }
     .main-content {
       margin: 0 7px;
+      .drag-wrap {
+        height: auto;
+        display: flex;
+        width: auto;
+        .directory {
+          //display: inline-block;
+        }
+      }
       .listWrap {
         padding: 10px 8px;
         text-align: left;
@@ -98,6 +143,7 @@ export default {
         float: left;
         margin-right: 15px;
         cursor: pointer;
+        //display: inline-block;
       }
       #addWrap {
         background: #ffffff !important;

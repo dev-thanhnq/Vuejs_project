@@ -29,7 +29,7 @@
           <div class="setting" @click="openProfile()">
             Cài đặt tài khoản
           </div>
-          <div class="logout" @click="logout()">
+          <div class="logout" @click="handlelogout()">
             Đăng xuất
           </div>
         </div>
@@ -40,9 +40,15 @@
 </template>
 
 <script>
+import {mapMutations, mapState} from "vuex";
+
 export default {
   name: "AdminLayout",
+  computed: {
+    ...mapState('auth', ['isAuthenticated']),
+  },
   methods: {
+    ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser']),
     openSetting() {
       if (this.$refs.usersetting.style.visibility == 'visible')
         this.$refs.usersetting.style.visibility = 'hidden'
@@ -54,8 +60,13 @@ export default {
     goToHome() {
       this.$router.push('home')
     },
-    logout() {
-      this.$router.push('path/login')
+    handlelogout() {
+      localStorage.removeItem('access_token')
+      this.updateLoginStatus(false)
+      this.updateAuthUser({})
+      if (this.$router.currentRoute.name !== 'Login') {
+        this.$router.push({ name: 'Login' })
+      }
     }
   }
 }

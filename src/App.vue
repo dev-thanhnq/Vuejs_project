@@ -1,25 +1,36 @@
 <template>
   <div id="app">
-<!--    <LoginLayout v-if="!checkLogin"/>-->
-<!--    <AdminLayout v-else/>-->
     <router-view/>
   </div>
 </template>
 
 <script>
-  // import LoginLayout from "@/layouts/LoginLayout";
-  // import AdminLayout from "@/layouts/AdminLayout";
-  export default {
-    components: {
-      // LoginLayout,
-      // AdminLayout
-    },
-    data() {
-      return {
-        checkLogin: false,
+import {mapState, mapMutations } from 'vuex'
+import api from './api'
+export default {
+  name: 'App',
+  computed: {
+    ...mapState('auth', ['isAuthenticated']),
+  },
+  methods: {
+    ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser']),
+    async handleLogout() {
+      localStorage.removeItem('access_token')
+      this.updateLoginStatus(false)
+      this.updateAuthUser({})
+      if (this.$router.currentRoute.name !== 'Login') {
+        await this.$router.push({ name: 'Login' })
       }
     }
+  },
+  mounted() {
+    api.getAuthUser().then((response) => {
+      if (response) {
+        this.updateAuthUser(response.data)
+      }
+    })
   }
+}
 </script>
 
 <style lang="scss">

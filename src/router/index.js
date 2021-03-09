@@ -11,6 +11,7 @@ const routes = [
     children: [
       {
         path: 'home',
+        name: 'Home',
         component: () => import('../views/Home')
       },
       {
@@ -21,16 +22,20 @@ const routes = [
   },
   {
     path: '/path',
-    name: 'Login',
     component: () => import('../layouts/LoginLayout'),
     children: [
       {
         path: 'login',
+        name: 'Login',
         component: () => import('../views/LoginForm')
       },
       {
         path: 'forgot-password',
         component: () => import('../views/ForgotPasswordForm')
+      },
+      {
+        path: 'register',
+        component: () => import('../views/Register')
       },
     ]
   },

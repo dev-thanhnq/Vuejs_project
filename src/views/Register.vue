@@ -3,38 +3,57 @@
     <div class="logo">
       <img src="../assets/images/blackpink.png" alt="">
     </div>
+    <div class="title">Đăng kí tài khoản</div>
     <el-form :model="ruleForm" :label-position="label" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
       <el-form-item prop="email">
-        <label style="float: left" >Email</label>
+        <label style="float: left" ><span style="color: #f54b5e">*</span> Email</label>
         <el-input v-model="ruleForm.email"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <label style="float: left" >Mật khẩu</label>
+        <label style="float: left" ><span style="color: #f54b5e">*</span> Mật khẩu</label>
         <el-input type="password" v-model="ruleForm.password"></el-input>
       </el-form-item>
+      <el-form-item prop="checkPass">
+        <label style="float: left" ><span style="color: #f54b5e">*</span> Xác nhận mật khẩu</label>
+        <el-input type="password" v-model="ruleForm.checkPass"></el-input>
+      </el-form-item>
+      <el-form-item prop="gender">
+        <label style="float: left" >Giớ tính</label>
+        <el-radio-group v-model="ruleForm.gender">
+          <el-radio label="Nam"></el-radio>
+          <el-radio label="Nữ"></el-radio>
+          <el-radio label="Khác"></el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
-    <div class="forgotPass">
-      <el-button @click="forgotPass()">Quên mật khẩu?</el-button>
-    </div>
-    <button class="btn-login" @click="handleogin('ruleForm')">
-      ĐĂNG NHẬP
+    <button class="btn-login" @click="register('ruleForm')">
+      ĐĂNG KÍ
     </button>
     <div class="register">
-      <el-button @click="register()">Đăng kí</el-button>
+      <el-button @click="login()">Đăng nhập</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import api from '../api'
-import {mapState, mapMutations} from 'vuex'
 export default {
   name: "LoginForm",
   data() {
+    var confirm = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('Yêu cầu xác nhận mật khẩu'));
+      } else if (value !== this.ruleForm.password) {
+        callback(new Error('Mật khẩu không chính xác!'));
+      } else {
+        callback();
+      }
+    };
     return {
       ruleForm: {
         email: '',
         password: '',
+        checkPass: '',
+        gender: '',
       },
       rules: {
         email: [
@@ -45,49 +64,37 @@ export default {
           { required: true, message: 'Mật khẩu không được bỏ trống!', trigger: 'change' },
           { min: 6, message: 'Mật khẩu không được ít hơn 6 kí tự', trigger: 'blur' },
         ],
+        checkPass: [
+          { validator: confirm, trigger: 'blur' }
+        ],
       },
       label: 'top',
     }
   },
-  computed: {
-    ...mapState('auth', ['isAuthenticated']),
-  },
   methods: {
-    ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser']),
     forgotPass() {
       this.$router.push('forgot-password')
     },
-    handleogin(formName) {
+    register(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          let data = {
-            email: this.ruleForm.email,
-            password: this.ruleForm.password,
-          }
-          api.login(data).then((response) => {
-            this.$message({
-              message: 'Đăng nhập thành công!',
-              type: 'success'
-            });
-            this.updateLoginStatus({isAuthenticated: true})
-            localStorage.setItem('access_token', response.data.access_token)
-            if (this.$router.currentRoute.name !== 'Home') {
-              this.$router.push({ name: 'Home' })
-            }
-          }).catch(() => {
-            this.$message({message: 'Email hoặc mật khẩu không chính xác', type: 'error'});
-          })
+          this.$message({
+            message: 'Đăng kí thành công!',
+            type: 'success',
+          });
+          console.log(this.ruleForm)
+          this.$router.push('/home')
         } else {
           this.$message({
-            message: 'Đăng nhập thất bại!',
+            message: 'Đăng kí thất bại!',
             type: 'error'
           });
           return false;
         }
       });
     },
-    register() {
-      this.$router.push('/path/register')
+    login() {
+      this.$router.push('/path/login')
     }
   }
 }
@@ -102,15 +109,20 @@ export default {
   box-sizing: border-box;
   .logo {
     width: 100%;
-    margin-bottom: 15px;
     img {
       width: 200px;
     }
   }
+  .title {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 20px;
+    font-weight: bold;
+  }
   .inputWrap {
-  width: 100%;
-  height: auto;
-  overflow: hidden;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
     .el-input {
       height: 50px !important;
     }
@@ -118,17 +130,6 @@ export default {
       font-size: 12px;
       color: #f54b5e;
       float: left;
-    }
-  }
-  .forgotPass {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-    .el-button {
-      border: 0;
-      color: #0080dd;
-      padding: 7px;
     }
   }
   .register {

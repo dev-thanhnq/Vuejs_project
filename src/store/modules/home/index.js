@@ -20,13 +20,13 @@ export default {
                 id: 1,
                 name: 'a',
                 description: 'hello',
-                list_id: 1,
+                directory_id: 8,
             },
             {
                 id: 2,
                 name: 'b',
                 description: 'hello',
-                list_id: 1,
+                directory_id: 8,
             },
             {
                 id: 3,
