@@ -53,7 +53,7 @@ export default {
     ...mapState('auth', ['isAuthenticated']),
   },
   methods: {
-    ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser']),
+    ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser', 'updateToken']),
     forgotPass() {
       this.$router.push('forgot-password')
     },
@@ -71,6 +71,7 @@ export default {
             });
             this.updateLoginStatus({isAuthenticated: true})
             localStorage.setItem('access_token', response.data.access_token)
+            this.updateToken(response.data.access_token)
             if (this.$router.currentRoute.name !== 'Home') {
               this.$router.push({ name: 'Home' })
             }

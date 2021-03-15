@@ -3,6 +3,7 @@ export default {
     state: {
         isAuthenticated: false,
         authUser: {},
+        token: false
     },
     getters: {
         //
@@ -13,6 +14,9 @@ export default {
         },
         updateAuthUser (state, authUser) {
             state.authUser = authUser
+        },
+        updateToken(state, token) {
+            state.token = token
         }
     },
 }

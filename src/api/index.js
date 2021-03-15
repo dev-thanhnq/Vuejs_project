@@ -28,6 +28,15 @@ apiAxios.interceptors.response.use(undefined, (error) => {
         }
     }
 })
+apiAxios.interceptors.request.use(config => {
+    let token = store.state.auth.token
+    if (token) {
+        config.headers.common['Authorization'] = `Bearer ${token}`
+    }
+    return config
+}, error => {
+    return Promise.reject(error)
+})
 // Khai báo các request sử dụng trong hệ thống
 export default {
     getAuthUser () {
@@ -86,8 +95,61 @@ export default {
     editCard(id, data) {
         return apiAxios({
             method: 'put',
-            url: 'cards/' + id,
+            url: '/cards/' + id,
             data: data
         })
-    }
+    },
+    detailCard(id) {
+        return apiAxios({
+            method: 'get',
+            url: '/cards/' + id,
+        })
+    },
+    getLabels() {
+        return apiAxios({
+            method: 'get',
+            url: '/labels'
+        })
+    },
+    createLabel(id, data) {
+        return apiAxios({
+            method: 'post',
+            url: '/cards/' + id + '/label',
+            data: data
+        })
+    },
+    createChecklist(data) {
+        return apiAxios({
+            method: 'post',
+            url: '/check-lists',
+            data: data
+        })
+    },
+    createSubCheckList(data) {
+        return apiAxios({
+            method: 'post',
+            url: '/check-list-childs',
+            data: data
+        })
+    },
+    deleteCheckList(id) {
+        return apiAxios({
+            method: 'delete',
+            url: '/check-lists/' + id,
+        })
+    },
+    updateStatusCheckListChild(id, status) {
+        return apiAxios({
+            method: 'put',
+            url: '/check-list-childs/' + id + '/change-status',
+            status: status
+        })
+    },
+    updateUser(data) {
+        return apiAxios({
+            method: 'put',
+            url: '/users',
+            data: data
+        })
+    },
 }

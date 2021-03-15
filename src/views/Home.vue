@@ -88,13 +88,10 @@ export default {
         })
       })
     },
-    deleteDirectory() {
-      this.getData()
-    },
     getData() {
       api.getDirectories().then((response) => {
         this.directories = response.data.data
-        console.log(this.directories)
+        console.log(response.data.data)
       })
     },
   },
