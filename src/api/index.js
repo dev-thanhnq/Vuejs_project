@@ -147,7 +147,7 @@ export default {
     },
     updateUser(data) {
         return apiAxios({
-            method: 'put',
+            method: 'post',
             url: '/users',
             data: data
         })

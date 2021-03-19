@@ -16,7 +16,12 @@ const routes = [
       },
       {
         path: '/profile',
+        name: 'UserSetting',
         component: () => import('../views/UserSetting')
+      },
+      {
+        path: '/password',
+        component: () => import('../views/PasswordSetting')
       },
     ]
   },

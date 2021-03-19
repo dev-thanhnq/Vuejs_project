@@ -17,14 +17,6 @@
         <label style="float: left" ><span style="color: #f54b5e">*</span> Xác nhận mật khẩu</label>
         <el-input type="password" v-model="ruleForm.checkPass"></el-input>
       </el-form-item>
-      <el-form-item prop="gender">
-        <label style="float: left" >Giớ tính</label>
-        <el-radio-group v-model="ruleForm.gender">
-          <el-radio label="Nam"></el-radio>
-          <el-radio label="Nữ"></el-radio>
-          <el-radio label="Khác"></el-radio>
-        </el-radio-group>
-      </el-form-item>
     </el-form>
     <button class="btn-login" @click="register('ruleForm')">
       ĐĂNG KÍ
@@ -53,7 +45,6 @@ export default {
         email: '',
         password: '',
         checkPass: '',
-        gender: '',
       },
       rules: {
         email: [

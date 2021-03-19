@@ -6,24 +6,26 @@
       </div>
     </div>
     <div class="main-content">
-      <draggable
-          class="drag-wrap"
-        :list="directories"
-          group="directories"
-      >
-        <List class="directory" v-for="(directory, index) in directories" :key="index"
-              :directory="directory"
-              @reloadDirectories="getData"
-        />
-      </draggable>
-      <div class="listWrap" ref="addListBtn" @click="createListForm()">
-        <i class="el-icon-plus"></i>
-        Thêm danh sách khác
-      </div>
-      <div class="listWrap" id="addWrap" ref="addListWrap">
-        <el-input placeholder="Nhập tiêu đề danh sách..." v-model="directoryName"></el-input>
-        <el-button type="success" class="add-list" @click="createList">Thêm danh sách</el-button>
-        <i class="el-icon-close close-add-list" @click="cancelCreateList()"></i>
+      <div class="content">
+        <draggable
+            class="drag-wrap"
+            :list="directories"
+            group="directories"
+        >
+          <List class="directory" v-for="(directory) in directories" :key="directory.id"
+                :directory="directory"
+                @reloadDirectories="getData"
+          />
+          <div class="listWrap add-directory" ref="addListBtn" @click="createListForm()">
+            <i class="el-icon-plus"></i>
+            Thêm danh sách khác
+          </div>
+          <div class="listWrap add-directory" id="addWrap" ref="addListWrap">
+            <el-input placeholder="Nhập tiêu đề danh sách..." v-model="directoryName"></el-input>
+            <el-button type="success" class="add-list" @click="createList">Thêm danh sách</el-button>
+            <i class="el-icon-close close-add-list" @click="cancelCreateList()"></i>
+          </div>
+        </draggable>
       </div>
     </div>
   </div>
@@ -78,6 +80,7 @@ export default {
         this.$message({
           message: 'Thêm mới thành công!',
           type: "success",
+          center: true
         })
         this.getData()
         this.cancelCreateList()
@@ -102,6 +105,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .homeWrap::-webkit-scrollbar {
+    width: 8px;
+  }
+  .homeWrap::-webkit-scrollbar-track {
+    border-radius: 7px;
+    background-color: #4a4a727d;
+  }
+  .homeWrap::-webkit-scrollbar {
+    height: 10px;
+    //width: 98%;
+  }
+  .homeWrap::-webkit-scrollbar-thumb:hover {
+    background: #d3d3d87d;
+  }
+  .homeWrap::-webkit-scrollbar-track {
+    border-radius: 7px;
+    background-color: #4f4f5073;
+  }
+  .homeWrap::-webkit-scrollbar-thumb {
+    background: #bcbcbe63;
+    border-radius: 7px;
+  }
   .homeWrap {
     height: 95vh;
     overflow-x: auto;
@@ -109,6 +134,7 @@ export default {
     .page-header {
       height: auto;
       overflow: hidden;
+      position: fixed;
       .page-title {
         margin: 7px;
         padding: 7px;
@@ -120,40 +146,51 @@ export default {
       }
     }
     .main-content {
+      position: relative;
+      outline: none;
       margin: 0 7px;
-      .drag-wrap {
-        height: auto;
-        display: flex;
-        width: auto;
-        .directory {
+      .content {
+        position: absolute;
+        overflow-x: auto;
+        top: 45px;
+        .drag-wrap {
+          height: auto;
+          display: flex;
+          width: auto;
+          .directory {
+            //display: inline-block;
+          }
+        }
+        .listWrap {
+          padding: 10px 8px;
+          text-align: left;
+          background: rgba(220 203 211 / 47%);
+          border-radius: 4px;
+          width: 272px;
+          box-sizing: border-box;
+          color: #ffffff;
+          float: left;
+          margin-right: 15px;
+          cursor: pointer;
           //display: inline-block;
         }
-      }
-      .listWrap {
-        padding: 10px 8px;
-        text-align: left;
-        background: rgba(220 203 211 / 47%);
-        border-radius: 4px;
-        width: 272px;
-        box-sizing: border-box;
-        color: #ffffff;
-        float: left;
-        margin-right: 15px;
-        cursor: pointer;
-        //display: inline-block;
-      }
-      #addWrap {
-        background: #ffffff !important;
-        color: #5e6c84;
-        display: none;
-        .add-list {
-          padding: 7px 10px;
-          margin: 4px 10px 0 0;
+        .add-directory {
+          width: 272px !important;
         }
-        .close-add-list {
-          font-size: 16px;
+        #addWrap {
+          background: #ffffff !important;
+          color: #5e6c84;
+          display: none;
+          .add-list {
+            padding: 7px 10px;
+            margin: 4px 10px 0 0;
+          }
+          .close-add-list {
+            font-size: 16px;
+          }
         }
       }
+
     }
   }
 </style>

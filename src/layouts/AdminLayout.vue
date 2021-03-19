@@ -82,7 +82,7 @@ export default {
       height: 40px;
       padding: 4px;
       box-sizing: border-box;
-      background: rgba(220 203 211 / 47%);
+      background: rgb(12 84 84 / 47%);
       display: flex;
       justify-content: center;
       align-items: center;

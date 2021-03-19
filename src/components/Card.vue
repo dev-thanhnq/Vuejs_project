@@ -55,8 +55,8 @@
               </div>
               <el-progress :percentage="0" style="margin-bottom: 15px"></el-progress>
               <div class="check-list-childs" v-for="(child, index) in checkList.check_list_childs" :key="index">
-                <el-checkbox v-if="child.status == 1" v-model="child.status" checked @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
-                <el-checkbox v-else v-model="child.status" @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
+                <el-checkbox v-if="child.status" checked @change="changeStatusCheckListChild(child.id, 0)">{{child.title}}</el-checkbox>
+                <el-checkbox v-else @change="changeStatusCheckListChild(child.id, 1)">{{child.title}}</el-checkbox>
               </div>
               <input v-if="addSubCheckList" type="text" class="input-sub-check-list" placeholder="Thêm một mục" ref="inputSubCheckList" v-model="subCheckListName">
               <div v-if="addSubCheckList" ref="btnSubCheckList">
@@ -133,6 +133,10 @@
                 default-time="12:00:00"
                 size="mini">
             </el-date-picker>
+          </div>
+          <div class="card-action-btn">
+            <i class="el-icon-link" style="margin-right: 7px"> </i>
+            Đính kèm
           </div>
         </el-col>
       </el-row>
@@ -280,13 +284,12 @@ name: "Card",
       this.addSubCheckList = false
     },
     changeStatusCheckListChild(id, status) {
-      if (status) {
-        status = 1
-      } else {
-        status = 0
+      let data = {
+        status: status
       }
-      api.updateStatusCheckListChild(id, status).then((response) => {
-        console.log(response)
+      api.updateStatusCheckListChild(id, data).then(() => {
+        this.getDetailCard()
+        console.log(this.card.check_lists)
       })
     },
     getDetailCard() {
