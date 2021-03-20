@@ -120,6 +120,7 @@ export default {
         padding: 10px;
         border-radius: 3px;
         font-size: 13px;
+        z-index: 50;
         .user-info {
           justify-content: left;
           display: flex;

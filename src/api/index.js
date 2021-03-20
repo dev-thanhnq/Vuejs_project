@@ -1,6 +1,7 @@
 import axios from 'axios'
 import store from "../store";
 import router from "../router";
+
 // Lấy ra các biến cần thiết: base url, token
 const baseUrl = process.env.VUE_APP_BASE_URL;
 const token = localStorage.getItem('access_token');
@@ -152,4 +153,46 @@ export default {
             data: data
         })
     },
+    cardDeadline(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/cards/'+ id +'/change-status-deadline',
+            data: data
+        })
+    },
+    changePassword(data) {
+        return apiAxios({
+            method: 'put',
+            url: '/users/password',
+            data: data
+        })
+    },
+    updateCardStatus(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/cards/'+ id +'/change-status',
+            data: data
+        })
+    },
+    uploadFile(id, data) {
+        return apiAxios({
+            method: 'post',
+            url: '/cards/'+ id +'/upload-file',
+            data: data
+        })
+    },
+    changeFileName(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/files/' + id,
+            data: data
+        })
+    },
+    changeIndexDirectory(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/directories/' + id + '/index',
+            data: data
+        })
+    }
 }

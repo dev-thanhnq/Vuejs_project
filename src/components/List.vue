@@ -11,7 +11,12 @@
           <i class="el-icon-close" @click="deleteList"></i>
         </el-button>
       </div>
-      <Card class="card" v-for="(card, index) in directory.cards" :key="index" :cardId="card.id"/>
+      <draggable class="drag-cards"
+                 group="cards"
+                 :list="directory.cards"
+                 :move="moveCard">
+        <Card v-for="(card) in directory.cards" :key="card.id" :cardId="card.id"/>
+      </draggable>
       <div class="btn-add-card" ref="btnAddCard">
         <el-button type="info" size="small" class="add-card" @click="addCard()">
           <i class="el-icon-plus"></i>
@@ -31,12 +36,14 @@
 import { mapState, mapMutations } from 'vuex'
 import api from '../api'
 import Card from "@/components/Card";
+import draggable from 'vuedraggable'
 
 export default {
   props: ['directory'],
   name: "Directory",
   components: {
-    Card
+    Card,
+    draggable
   },
   computed: {
     ...mapState('home', [
@@ -140,6 +147,9 @@ export default {
     },
     reloadDirectories() {
       this.$emit('reloadDirectories')
+    },
+    moveCard(e) {
+      console.log(e)
     }
   },
   mounted() {

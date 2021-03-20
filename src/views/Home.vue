@@ -11,6 +11,7 @@
             class="drag-wrap"
             :list="directories"
             group="directories"
+            :move="moveDirectory"
         >
           <List class="directory" v-for="(directory) in directories" :key="directory.id"
                 :directory="directory"
@@ -90,6 +91,13 @@ export default {
           type: "error"
         })
       })
+    },
+    moveDirectory(e) {
+      let id = e.draggedContext.element.id
+      let data = {
+        index: e.draggedContext.futureIndex
+      }
+      api.changeIndexDirectory(id, data)
     },
     getData() {
       api.getDirectories().then((response) => {

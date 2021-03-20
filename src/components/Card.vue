@@ -14,14 +14,24 @@
           <el-row>
             <el-col :span="2">a</el-col>
             <el-col :span="22">
-              <div v-if="card.labels" class="">
-                <div>Nhãn</div>
+              <div v-if="card.labels" class="" style="margin-bottom: 10px">
+                <div style="margin-bottom: 5px">NHÃN</div>
                 <el-tag v-for="(label, index) in card.labels" :key="index"
                         :color="label.color"
                         effect="dark"
                         style="margin-right: 5px; border: 0">
                   {{label.name}}
                 </el-tag>
+              </div>
+              <div class="deadline" v-if="card.deadline">
+                <div style="margin-bottom: 5px">NGÀY HẾT HẠN</div>
+                <el-checkbox v-model="deadlineStatus" @change="handleChangeDeadlineStatus">
+                  <div class="card-action-btn" style="padding-right: 7px">
+                    {{formatDate(card.deadline)}}
+                    <div class="status-deadline-fail" v-if="formatDate(deadline) < moment(new Date()).format('YYYY-MM-DD HH:mm:ss') && card.status == 0">QUÁ HẠN</div>
+                    <div class="status-deadline-success" v-else-if="card.status ==1">HOÀN TẤT</div>
+                  </div>
+                </el-checkbox>
               </div>
             </el-col>
           </el-row>
@@ -55,8 +65,7 @@
               </div>
               <el-progress :percentage="0" style="margin-bottom: 15px"></el-progress>
               <div class="check-list-childs" v-for="(child, index) in checkList.check_list_childs" :key="index">
-                <el-checkbox v-if="child.status" checked @change="changeStatusCheckListChild(child.id, 0)">{{child.title}}</el-checkbox>
-                <el-checkbox v-else @change="changeStatusCheckListChild(child.id, 1)">{{child.title}}</el-checkbox>
+                <el-checkbox v-model="child.status" @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
               </div>
               <input v-if="addSubCheckList" type="text" class="input-sub-check-list" placeholder="Thêm một mục" ref="inputSubCheckList" v-model="subCheckListName">
               <div v-if="addSubCheckList" ref="btnSubCheckList">
@@ -68,6 +77,42 @@
               </div>
             </el-col>
           </el-row>
+          <el-row style="" class="card-info">
+            <el-col :span="2" style="font-size: 20px">
+              <i class="el-icon-paperclip"></i>
+            </el-col>
+            <el-col :span="22" style="padding-right: 18px">
+              <div class="card-info-title">
+                Các tập tin đính kèm
+              </div>
+              <div class="file-item" v-for="file in card.files" :key="file.id">
+                <img class="card-files" :src="baseFileUrl + file.path" alt="">
+                <div class="card-files-info">
+                  <div class="file-name">{{file.name}}</div>
+                  <el-link type="info">Xóa</el-link>
+                  -
+                  <el-popover
+                      placement="top-start"
+                      width="300"
+                      trigger="click"
+                      >
+                    <div class="add-labels">
+                      <div class="add-labels-header">
+                        Sửa tệp đính kèm
+                      </div>
+                      <div class="form-add-labels">
+                        Tên liên kết
+                        <br>
+                        <input type="text" class="label-name" ref="inputLabel" v-model="fileName" >
+                        <el-button type="success" size="small" @click="handleChangeFileName(file.id)">Cập nhật</el-button>
+                      </div>
+                    </div>
+                    <el-link type="info" slot="reference" @click="openChangeFileName(file.name)">Chỉnh sửa</el-link>
+                  </el-popover>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
         </el-col>
         <el-col :span="6" class="card-info">
           <div style="margin-bottom: 7px">THÊM VÀO THẺ</div>
@@ -75,31 +120,39 @@
               placement="bottom"
               width="300"
               trigger="click">
-            <div class="add-labels">
-              <div class="add-labels-header">
-                Nhãn
+            abc
+            <el-popover
+                placement="bottom"
+                title="Title"
+                width="300"
+                trigger="click"
+                >
+              <div class="add-labels">
+                <div class="add-labels-header">
+                  Nhãn
+                </div>
+                <div class="form-add-labels">
+                  Tên
+                  <br>
+                  <input type="text" class="label-name" ref="inputLabel" v-model="labelName">
+                  <p style="margin: 0 0 5px 0">Chọn một màu</p>
+                  <div class="labels-color" style="background-color: #61bd4f" @click="selectlabelColor('#61bd4f')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #f2d600" @click="selectlabelColor('#f2d600')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #ff9f1a" @click="selectlabelColor('#ff9f1a')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #eb5a46" @click="selectlabelColor('#eb5a46')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #c377e0" @click="selectlabelColor('#c377e0')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #0079bf" @click="selectlabelColor('#0079bf')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #00c2e0" @click="selectlabelColor('#00c2e0')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #51e898" @click="selectlabelColor('#51e898')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #ff78cb" @click="selectlabelColor('#ff78cb')"><i class="check-color el-icon-check"></i></div>
+                  <div class="labels-color" style="background-color: #344563" @click="selectlabelColor('#344563')"><i class="check-color el-icon-check"></i></div>
+                  <el-button class="btn-save-label" type="success" size="small" @click="addLabel">Tạo mới</el-button>
+                </div>
               </div>
-              <div class="card-action-btn" style="justify-content: center">
+              <div class="card-action-btn" style="justify-content: center; margin-top: 10px" slot="reference">
                 Thêm nhãn mới
               </div>
-              <div class="form-add-labels">
-                Tên
-                <br>
-                <input type="text" class="label-name" ref="inputLabel" v-model="labelName">
-                <p style="margin: 0 0 5px 0">Chọn một màu</p>
-                <div class="labels-color" style="background-color: #61bd4f" @click="selectlabelColor('#61bd4f')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #f2d600" @click="selectlabelColor('#f2d600')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #ff9f1a" @click="selectlabelColor('#ff9f1a')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #eb5a46" @click="selectlabelColor('#eb5a46')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #c377e0" @click="selectlabelColor('#c377e0')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #0079bf" @click="selectlabelColor('#0079bf')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #00c2e0" @click="selectlabelColor('#00c2e0')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #51e898" @click="selectlabelColor('#51e898')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #ff78cb" @click="selectlabelColor('#ff78cb')"><i class="check-color el-icon-check"></i></div>
-                <div class="labels-color" style="background-color: #344563" @click="selectlabelColor('#344563')"><i class="check-color el-icon-check"></i></div>
-                <el-button class="btn-save-label" type="success" size="small" @click="addLabel">Tạo mới</el-button>
-              </div>
-            </div>
+            </el-popover>
             <div class="card-action-btn" slot="reference">
               <i class="el-icon-collection-tag" style="margin-right: 7px"> </i>
               Nhãn
@@ -130,20 +183,24 @@
             <el-date-picker
                 v-model="deadline"
                 type="datetime"
-                default-time="12:00:00"
-                size="mini">
+                size="mini"
+                @change="updateDeadline">
             </el-date-picker>
           </div>
-          <div class="card-action-btn">
-            <i class="el-icon-link" style="margin-right: 7px"> </i>
-            Đính kèm
-          </div>
+          <label for="file">
+            <div class="card-action-btn">
+              <i class="el-icon-link" style="margin-right: 7px"> </i>
+              Đính kèm
+            </div>
+          </label>
+          <input style="display: none" ref="file" type="file" accept="image/*" id="file" @change="handleUploadFile">
         </el-col>
       </el-row>
     </el-dialog>
-    <draggable class="drag-cards"
-               group="card"
-    >
+<!--    <draggable class="drag-cards"-->
+<!--               group="card"-->
+<!--               :move="moveCard"-->
+<!--    >-->
       <div class="card" ref="card" @mouseover="cardHover" @mouseleave="cardHoverOut">
         <div class="card-more" ref="cardMore" @click="openCardAction" slot="reference"><i class="el-icon-edit"></i></div>
         <div class="card-content" @click="openDetailCard">
@@ -155,23 +212,26 @@
             </el-tag>
           </div>
           <div class="card-name">
-            {{card.title}}
+            <div style="width: 100%;">{{card.title}}</div>
           </div>
+          <div class="status-deadline-fail" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-if="formatDate(deadline) < moment(new Date()).format('YYYY-MM-DD HH:mm:ss') && card.status == 0"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
+          <div class="status-deadline-success" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-else-if="card.status ==1"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
         </div>
       </div>
-    </draggable>
+<!--    </draggable>-->
   </div>
 </template>
 
 <script>
 import api from "@/api";
-import draggable from 'vuedraggable'
+// import draggable from 'vuedraggable'
+import moment from 'moment'
 
 export default {
   props: ['cardId'],
 name: "Card",
   components: {
-    draggable
+    // draggable
   },
   data () {
     return {
@@ -188,11 +248,16 @@ name: "Card",
       checkListName: '',
       subCheckListName: '',
       addSubCheckList: false,
+      deadlineStatus: '',
+      baseFileUrl: 'http://vuecourse.zent.edu.vn/storage/',
+      fileName: '',
+      popoverFile: true
     }
   },
   methods: {
     openDetailCard() {
       this.dialogVisible = true
+      console.log(this.card)
       api.getLabels().then((response) => {
         this.labels = response.data.data
       })
@@ -284,6 +349,11 @@ name: "Card",
       this.addSubCheckList = false
     },
     changeStatusCheckListChild(id, status) {
+      if (status) {
+        status = 1
+      } else {
+        status = 0
+      }
       let data = {
         status: status
       }
@@ -296,6 +366,11 @@ name: "Card",
       api.detailCard(this.cardId).then((response) => {
         this.card = response.data.data
         this.carDescription = response.data.data.description
+        if (this.card.status == 1) {
+          this.deadlineStatus = true
+        } else {
+          this.deadlineStatus = false
+        }
       })
     },
     cardHover() {
@@ -306,6 +381,60 @@ name: "Card",
     },
     openCardAction() {
       console.log('action')
+    },
+    updateDeadline() {
+      let data = {
+        deadline: this.formatDate(this.deadline)
+      }
+      api.cardDeadline(this.card.id, data).then(() => {
+        this.getDetailCard()
+      })
+    },
+    formatDate (dateString) {
+      return moment(dateString).format('YYYY-MM-DD HH:mm:ss')
+    },
+    fomatDateCard(date) {
+      return moment(date).format('DD - MM')
+    },
+    handleChangeDeadlineStatus(e) {
+      let data
+      if (e) {
+        data = {
+          status: 1
+        }
+      } else {
+        data = {
+          status: 0
+        }
+      }
+      api.updateCardStatus(this.card.id, data).then(() => {
+        this.getDetailCard()
+      })
+    },
+    handleUploadFile(e) {
+      if (e.target.files.length) {
+        const data = new FormData()
+        data.append('file', e.target.files[0])
+        api.uploadFile(this.card.id, data).then(() => {
+          this.getDetailCard()
+        })
+      }
+    },
+    openChangeFileName(name) {
+      this.fileName = name
+    },
+    handleChangeFileName(id) {
+      let data = {
+        name: this.fileName
+      }
+      api.changeFileName(id, data).then(() => {
+        this.getDetailCard()
+        this.popoverFile = false
+      })
+    },
+    moveCard(e) {
+      console.log(e)
+      console.log('ok')
     }
   },
   mounted() {
@@ -330,6 +459,22 @@ name: "Card",
   }
   #description {
     position: relative;
+  }
+  .status-deadline-fail {
+    color: #ffffff;
+    padding: 1px;
+    font-size: 12px;
+    background-color: #ec9488;
+    border-radius: 3px;
+    margin-left: 7px;
+  }
+  .status-deadline-success {
+    color: #ffffff;
+    padding: 1px;
+    font-size: 12px;
+    background-color: #61bd4f;
+    border-radius: 3px;
+    margin-left: 7px;
   }
   .card-info {
     margin-top: 20px;
@@ -372,6 +517,30 @@ name: "Card",
     }
     .check-list-childs {
       margin-bottom: 15px;
+    }
+    .card-files {
+      width: 115px;
+      height: 80px;
+      border-radius: 3px;
+    }
+    .file-item {
+      position: relative;
+      margin-bottom: 10px;
+      height: 81px;
+      .card-files-info {
+        width: 200px;
+        position: absolute;
+        top: 10px;
+        left: 130px;
+        .file-name {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 25px;
+        }
+      }
+    }
+    .file-item:hover {
+      background-color: rgb(22 23 25 / 12%);
     }
   }
   .add-labels {

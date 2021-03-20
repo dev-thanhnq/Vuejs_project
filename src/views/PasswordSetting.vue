@@ -19,7 +19,7 @@
             </el-form-item>
           </el-form>
           <div class="forgotPass">
-            <el-button @click="forgotPass()">Quay lại</el-button>
+            <el-button @click="profile()">Quay lại</el-button>
           </div>
           <button class="btn-login" @click="changePassword('ruleForm')">
             ĐỔI MẬT KHẨU
@@ -63,16 +63,28 @@ export default {
     }
   },
   methods: {
-    forgotPass() {
+    profile() {
       this.$router.push('profile')
     },
     changePassword(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$message({
-            message: 'Cập nhật thành công!',
-            type: 'success'
-          });
+          let data = {
+            password: this.ruleForm.password,
+            password_confirmation: this.ruleForm.checkPass
+          }
+          api.changePassword(data).then(() => {
+            this.$message({
+              message: 'Cập nhật thành công!',
+              type: 'success'
+            });
+            this.$router.push('profile')
+          }).catch(() => {
+            this.$message({
+              message: 'Cập nhật thất bại!',
+              type: 'error'
+            });
+          })
         }
       });
     },
