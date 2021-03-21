@@ -18,7 +18,7 @@
         <el-input type="password" v-model="ruleForm.checkPass"></el-input>
       </el-form-item>
     </el-form>
-    <button class="btn-login" @click="register('ruleForm')">
+    <button class="btn-login" @click="handleRegister('ruleForm')">
       ĐĂNG KÍ
     </button>
     <div class="register">
@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import api from '../api'
+
 export default {
   name: "LoginForm",
   data() {
@@ -66,21 +68,24 @@ export default {
     forgotPass() {
       this.$router.push('forgot-password')
     },
-    register(formName) {
+    handleRegister(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$message({
-            message: 'Đăng kí thành công!',
-            type: 'success',
-          });
-          console.log(this.ruleForm)
-          this.$router.push('/home')
-        } else {
-          this.$message({
-            message: 'Đăng kí thất bại!',
-            type: 'error'
-          });
-          return false;
+          let data = {
+            name: this.ruleForm.name,
+            email: this.ruleForm.email,
+            password: this.ruleForm.password
+          }
+          api.register(data).then(() => {
+            this.$message({
+              message: 'Chào mừng bận đén với BLACKPINK!',
+              type: "success",
+              center: true
+            })
+            if (this.$router.currentRoute.name !== 'Home') {
+              this.$router.push({ name: 'Home' })
+            }
+          })
         }
       });
     },
@@ -109,6 +114,7 @@ export default {
     padding: 10px 0;
     font-size: 20px;
     font-weight: bold;
+    color: #f4a7bb;
   }
   .inputWrap {
     width: 100%;

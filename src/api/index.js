@@ -119,6 +119,26 @@ export default {
             data: data
         })
     },
+    addLabel(id, data) {
+        return apiAxios({
+            method: 'post',
+            url: '/cards/' + id + '/attach-labels',
+            data: data
+        })
+    },
+    removeLabelFromCard(id, data) {
+        return apiAxios({
+            method: 'delete',
+            url: 'cards/'+ id +'/detach-labels',
+            data: data
+        })
+    },
+    deleteLabel(id) {
+        return apiAxios({
+            method: 'delete',
+            url: '/labels/' + id,
+        })
+    },
     createChecklist(data) {
         return apiAxios({
             method: 'post',
@@ -139,11 +159,11 @@ export default {
             url: '/check-lists/' + id,
         })
     },
-    updateStatusCheckListChild(id, status) {
+    updateStatusCheckListChild(id, data) {
         return apiAxios({
             method: 'put',
-            url: '/check-list-childs/' + id + '/change-status',
-            status: status
+            url: '/check-list-childs/'+ id +'/change-status',
+            data: data
         })
     },
     updateUser(data) {
@@ -193,6 +213,32 @@ export default {
             method: 'put',
             url: '/directories/' + id + '/index',
             data: data
+        })
+    },
+    changeCardDirectory(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/cards/' + id + '/directory',
+            data: data
+        })
+    },
+    changeCardIndex(id, data) {
+        return apiAxios({
+            method: 'put',
+            url: '/cards/' + id + '/index',
+            data: data
+        })
+    },
+    deleteCard(id) {
+        return apiAxios({
+            method: 'delete',
+            url: '/cards/' + id,
+        })
+    },
+    deleteFile(id) {
+        return apiAxios({
+            method: 'delete',
+            url: '/files/' + id,
         })
     }
 }

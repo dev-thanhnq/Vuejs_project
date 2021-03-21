@@ -13,15 +13,15 @@
             group="directories"
             :move="moveDirectory"
         >
-          <List class="directory" v-for="(directory) in directories" :key="directory.id"
+          <List class="directory" v-for="(directory) in directories" :key="directory.id" :id="directory.id"
                 :directory="directory"
                 @reloadDirectories="getData"
           />
-          <div class="listWrap add-directory" ref="addListBtn" @click="createListForm()">
+          <div class="listWrap add-directory-btn" ref="addListBtn" @click="createListForm()">
             <i class="el-icon-plus"></i>
             Thêm danh sách khác
           </div>
-          <div class="listWrap add-directory" id="addWrap" ref="addListWrap">
+          <div class="listWrap add-directory-form" id="addWrap" ref="addListWrap">
             <el-input placeholder="Nhập tiêu đề danh sách..." v-model="directoryName"></el-input>
             <el-button type="success" class="add-list" @click="createList">Thêm danh sách</el-button>
             <i class="el-icon-close close-add-list" @click="cancelCreateList()"></i>
@@ -182,8 +182,11 @@ export default {
           cursor: pointer;
           //display: inline-block;
         }
-        .add-directory {
-          width: 272px !important;
+        .add-directory-btn {
+          height: 38px;
+        }
+        .add-directory-form {
+          height: 90px;
         }
         #addWrap {
           background: #ffffff !important;

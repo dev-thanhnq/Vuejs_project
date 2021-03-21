@@ -15,7 +15,7 @@
                  group="cards"
                  :list="directory.cards"
                  :move="moveCard">
-        <Card v-for="(card) in directory.cards" :key="card.id" :cardId="card.id"/>
+        <Card v-for="(card) in directory.cards" :key="card.id" :cardId="card.id" @reload="reloadDirectories"/>
       </draggable>
       <div class="btn-add-card" ref="btnAddCard">
         <el-button type="info" size="small" class="add-card" @click="addCard()">
@@ -149,11 +149,20 @@ export default {
       this.$emit('reloadDirectories')
     },
     moveCard(e) {
-      console.log(e)
+      let id = e.draggedContext.element.id
+      let index = e.draggedContext.futureIndex
+      let a = e.to.parentElement
+      let data = {
+        index: index,
+        directory_id: a.parentElement.getAttribute('id')
+      }
+      console.log(data)
+      api.changeCardDirectory(id, data).then(() => {
+
+      })
     }
   },
   mounted() {
-
   }
 }
 </script>

@@ -65,10 +65,6 @@ export default {
             password: this.ruleForm.password,
           }
           api.login(data).then((response) => {
-            this.$message({
-              message: 'Đăng nhập thành công!',
-              type: 'success'
-            });
             this.updateLoginStatus({isAuthenticated: true})
             localStorage.setItem('access_token', response.data.access_token)
             this.updateToken(response.data.access_token)

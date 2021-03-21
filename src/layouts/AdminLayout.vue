@@ -7,7 +7,8 @@
         </div>
         <div class="avatar" @click="openSetting()">
           <el-avatar>
-            <img src="../assets/images/mandoo.jpg" alt="">
+            <img v-if="avatarUrl" :src="avatarUrl" alt="" >
+            <img v-else src="../assets/images/default-avatar2.png" alt="">
           </el-avatar>
         </div>
         <div class="user-setting" ref="usersetting">
@@ -17,12 +18,13 @@
           </div>
           <div class="user-info">
             <el-avatar>
-              <img src="../assets/images/mandoo.jpg" alt="">
+              <img v-if="avatarUrl" :src="avatarUrl" alt="" >
+              <img v-else src="../assets/images/default-avatar2.png" alt="">
             </el-avatar>
             <div class="name-mail">
-              <div class="name">Nguyễn Quang Thành</div>
+              <div class="name">{{user.name}}</div>
               <br>
-              <span class="email">thanhnq@zent.vn</span>
+              <span class="email">{{user.email}}</span>
             </div>
           </div>
           <hr>
@@ -41,11 +43,19 @@
 
 <script>
 import {mapMutations, mapState} from "vuex";
+import api from "@/api";
 
 export default {
+  data () {
+    return {
+      user: [],
+      baseUrl: 'http://vuecourse.zent.edu.vn/storage/users/',
+      avatarUrl: ''
+    }
+  },
   name: "AdminLayout",
   computed: {
-    ...mapState('auth', ['isAuthenticated']),
+    ...mapState('auth', ['isAuthenticated', 'authUser']),
   },
   methods: {
     ...mapMutations('auth', ['updateLoginStatus', 'updateAuthUser']),
@@ -56,6 +66,9 @@ export default {
     },
     openProfile() {
       this.$router.push('profile')
+      if (this.$refs.usersetting.style.visibility == 'visible')
+        this.$refs.usersetting.style.visibility = 'hidden'
+      else this.$refs.usersetting.style.visibility = 'visible'
     },
     goToHome() {
       this.$router.push('home')
@@ -68,6 +81,16 @@ export default {
         this.$router.push({ name: 'Login' })
       }
     }
+  },
+  mounted() {
+    api.getAuthUser().then((response) => {
+      if (response) {
+        this.user = response.data
+        if (response.data.avatar) {
+          this.avatarUrl = this.baseUrl + response.data.avatar
+        }
+      }
+    })
   }
 }
 </script>

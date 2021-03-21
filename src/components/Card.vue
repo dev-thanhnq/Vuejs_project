@@ -44,7 +44,7 @@
                 Mô tả
                 <el-button size="small" style="padding: 5px 10px; margin-left: 5px" @click="openEditCardDescription" plain>Chỉnh sửa</el-button>
               </div>
-              <div v-if="carDescription" class="card-description">
+              <div v-if="card.description" class="card-description" ref="description">
                 {{ card.description }}
               </div>
               <div v-else class="add-card-description" ref="cardDescriptionBtn" @click="openEditCardDescription">
@@ -63,9 +63,10 @@
                 {{checkList.title}}
                 <el-button size="small" style="padding: 5px 10px; margin-left: 5px; float: right" @click="handleDeleteCheckList(checkList.id)" plain>Xóa</el-button>
               </div>
-              <el-progress :percentage="0" style="margin-bottom: 15px"></el-progress>
+              <el-progress :percentage="checkPercentComplete(checkList.check_list_childs)" style="margin-bottom: 15px"></el-progress>
               <div class="check-list-childs" v-for="(child, index) in checkList.check_list_childs" :key="index">
-                <el-checkbox v-model="child.status" @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
+                <el-checkbox v-if="child.status == 1" v-model="child.status" checked @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
+                <el-checkbox v-else v-model="child.status" @change="changeStatusCheckListChild(child.id, child.status)">{{child.title}}</el-checkbox>
               </div>
               <input v-if="addSubCheckList" type="text" class="input-sub-check-list" placeholder="Thêm một mục" ref="inputSubCheckList" v-model="subCheckListName">
               <div v-if="addSubCheckList" ref="btnSubCheckList">
@@ -89,7 +90,17 @@
                 <img class="card-files" :src="baseFileUrl + file.path" alt="">
                 <div class="card-files-info">
                   <div class="file-name">{{file.name}}</div>
-                  <el-link type="info">Xóa</el-link>
+                  <el-popover
+                      placement="top"
+                      width="160"
+                      v-model="deleteFilePop">
+                    <p>Bạn có chắn chắn muốn xóa?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="info" @click="deleteFilePop = false">Hủy</el-button>
+                      <el-button type="danger" size="mini" @click="handleDeleteFile(file.id)">Xóa</el-button>
+                    </div>
+                    <el-link type="info" slot="reference">Xóa</el-link>
+                  </el-popover>
                   -
                   <el-popover
                       placement="top-start"
@@ -120,39 +131,48 @@
               placement="bottom"
               width="300"
               trigger="click">
-            abc
-            <el-popover
-                placement="bottom"
-                title="Title"
-                width="300"
-                trigger="click"
-                >
-              <div class="add-labels">
-                <div class="add-labels-header">
-                  Nhãn
+            <div class="add-labels">
+              <div class="add-labels-header">
+                Nhãn
+              </div>
+              <div ref="listLabel">
+                <div class="card-action-btn" style="justify-content: center; margin-top: 10px" @click="openFromAddlabel">
+                  Thêm nhãn mới
                 </div>
-                <div class="form-add-labels">
-                  Tên
-                  <br>
-                  <input type="text" class="label-name" ref="inputLabel" v-model="labelName">
-                  <p style="margin: 0 0 5px 0">Chọn một màu</p>
-                  <div class="labels-color" style="background-color: #61bd4f" @click="selectlabelColor('#61bd4f')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #f2d600" @click="selectlabelColor('#f2d600')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #ff9f1a" @click="selectlabelColor('#ff9f1a')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #eb5a46" @click="selectlabelColor('#eb5a46')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #c377e0" @click="selectlabelColor('#c377e0')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #0079bf" @click="selectlabelColor('#0079bf')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #00c2e0" @click="selectlabelColor('#00c2e0')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #51e898" @click="selectlabelColor('#51e898')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #ff78cb" @click="selectlabelColor('#ff78cb')"><i class="check-color el-icon-check"></i></div>
-                  <div class="labels-color" style="background-color: #344563" @click="selectlabelColor('#344563')"><i class="check-color el-icon-check"></i></div>
-                  <el-button class="btn-save-label" type="success" size="small" @click="addLabel">Tạo mới</el-button>
+                <div v-for="label in labels" :key="label.id">
+                  <el-tag
+                      :color="label.color"
+                      style="width: 87%; margin: 0 12px 3px 0; color: #ffffff; font-family: Arial; cursor: pointer"
+                      @click="addExitsLabel(label.id)">{{label.name}}</el-tag>
+                  <i class="el-icon-edit" style="cursor: pointer" @click="openFromEditlabel(label.name, label.id)"></i>
                 </div>
               </div>
-              <div class="card-action-btn" style="justify-content: center; margin-top: 10px" slot="reference">
-                Thêm nhãn mới
+              <div class="form-add-labels" ref="formAddLabel">
+                Tên
+                <br>
+                <input type="text" class="label-name" ref="inputLabel" v-model="labelName">
+                <p style="margin: 0 0 5px 0">Chọn một màu</p>
+                <div class="labels-color" style="background-color: #61bd4f" @click="selectlabelColor('#61bd4f')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #f2d600" @click="selectlabelColor('#f2d600')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #ff9f1a" @click="selectlabelColor('#ff9f1a')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #eb5a46" @click="selectlabelColor('#eb5a46')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #c377e0" @click="selectlabelColor('#c377e0')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #0079bf" @click="selectlabelColor('#0079bf')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #00c2e0" @click="selectlabelColor('#00c2e0')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #51e898" @click="selectlabelColor('#51e898')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #ff78cb" @click="selectlabelColor('#ff78cb')"><i class="check-color el-icon-check"></i></div>
+                <div class="labels-color" style="background-color: #344563" @click="selectlabelColor('#344563')"><i class="check-color el-icon-check"></i></div>
+                <el-button class="btn-save-label" type="success" size="small" @click="addLabel">Tạo mới</el-button>
+                <el-button class="btn-save-label" type="info" size="small" @click="cancelFromAddlabel">Hủy</el-button>
               </div>
-            </el-popover>
+              <div class="form-add-labels" ref="formEditLabel">
+                Tên
+                <br>
+                <input type="text" class="label-name" ref="inputLabel" v-model="labelNameEdit">
+                <el-button class="btn-save-label" type="danger" size="small" @click="handleDeleteLabel(labelId)">Xóa</el-button>
+                <el-button class="btn-save-label" type="info" size="small" @click="cancelFromEditlabel">Huỷ</el-button>
+              </div>
+            </div>
             <div class="card-action-btn" slot="reference">
               <i class="el-icon-collection-tag" style="margin-right: 7px"> </i>
               Nhãn
@@ -180,6 +200,7 @@
           </el-popover>
           <div class="card-action-btn">
             <i class="el-icon-time" style="margin-right: 7px"> </i>
+            Ngày hết hạn
             <el-date-picker
                 v-model="deadline"
                 type="datetime"
@@ -197,41 +218,34 @@
         </el-col>
       </el-row>
     </el-dialog>
-<!--    <draggable class="drag-cards"-->
-<!--               group="card"-->
-<!--               :move="moveCard"-->
-<!--    >-->
-      <div class="card" ref="card" @mouseover="cardHover" @mouseleave="cardHoverOut">
-        <div class="card-more" ref="cardMore" @click="openCardAction" slot="reference"><i class="el-icon-edit"></i></div>
-        <div class="card-content" @click="openDetailCard">
-          <div class="card-labels">
-            <el-tag v-for="(label, index) in card.labels" :key="index"
-                    :color="label.color"
-                    effect="dark"
-                    style="margin-right: 5px; border: 0">
-            </el-tag>
-          </div>
-          <div class="card-name">
-            <div style="width: 100%;">{{card.title}}</div>
-          </div>
-          <div class="status-deadline-fail" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-if="formatDate(deadline) < moment(new Date()).format('YYYY-MM-DD HH:mm:ss') && card.status == 0"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
-          <div class="status-deadline-success" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-else-if="card.status ==1"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
+    <div class="card" ref="card" @mouseover="cardHover" @mouseleave="cardHoverOut">
+      <div class="card-more" ref="cardMore" @click="handleDeleteCard" slot="reference"><i class="el-icon-delete"></i></div>
+      <div class="card-content" @click="openDetailCard">
+        <div class="card-labels">
+          <el-tag v-for="(label, index) in card.labels" :key="index"
+                  :color="label.color"
+                  effect="dark"
+                  style="margin-right: 5px; border: 0">
+          </el-tag>
         </div>
+        <div class="card-name">
+          <div style="width: 100%;">{{card.title}}</div>
+        </div>
+        <div class="status-deadline-fail" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-if="formatDate(deadline) < moment(new Date()).format('YYYY-MM-DD HH:mm:ss') && card.status == 0"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
+        <div class="status-deadline-success" style="width: 64px; display:inline-block; margin: 0 0 4px 0; font-size: 14px" v-else-if="card.status ==1"><i class="el-icon-time"></i> {{fomatDateCard(card.deadline)}}</div>
       </div>
-<!--    </draggable>-->
+    </div>
   </div>
 </template>
 
 <script>
 import api from "@/api";
-// import draggable from 'vuedraggable'
 import moment from 'moment'
 
 export default {
   props: ['cardId'],
 name: "Card",
   components: {
-    // draggable
   },
   data () {
     return {
@@ -241,6 +255,8 @@ name: "Card",
       carDescription: false,
       labels: [],
       labelName: '',
+      labelNameEdit: '',
+      labelId: '',
       labelColor: '',
       cards: [],
       deadline: '',
@@ -251,10 +267,15 @@ name: "Card",
       deadlineStatus: '',
       baseFileUrl: 'http://vuecourse.zent.edu.vn/storage/',
       fileName: '',
-      popoverFile: true
+      popoverFile: false,
+      popoverLabel: false,
+      deleteFilePop: false
     }
   },
   methods: {
+    test() {
+      console.log('test')
+    },
     openDetailCard() {
       this.dialogVisible = true
       console.log(this.card)
@@ -274,8 +295,11 @@ name: "Card",
       })
     },
     openEditCardDescription() {
-      if (!this.carDescription) {
+      if (!this.card.description) {
         this.$refs.cardDescriptionBtn.style.display = 'none'
+      }
+      if (this.card.description) {
+        this.$refs.description.style.display = 'none'
       }
       this.$refs.cardDescription.style.display = 'block'
     },
@@ -289,6 +313,7 @@ name: "Card",
           type: 'success'
         });
         this.getDetailCard()
+        this.$refs.cardDescription.style.display = 'none'
       })
     },
     selectlabelColor(color) {
@@ -309,6 +334,7 @@ name: "Card",
           this.labelColor = ''
           this.$refs.inputLabel.style.background = '#ffffff'
           this.$refs.inputLabel.style.color = '#000000'
+          this.$refs.inputLabel.style.border = '#000000'
           this.getDetailCard()
           this.dialogVisible = true
         })
@@ -358,9 +384,22 @@ name: "Card",
         status: status
       }
       api.updateStatusCheckListChild(id, data).then(() => {
-        this.getDetailCard()
-        console.log(this.card.check_lists)
+
       })
+    },
+    checkPercentComplete(arr) {
+      let totalChildrenWork = arr.length;
+      let a = 0;
+      if(arr.length !== 0) {
+        arr.forEach((item) => {
+          if(item.status == 1) {
+            a = a + 1;
+          }
+        })
+        return Math.ceil(a / totalChildrenWork * 100)
+      } else {
+        return 0
+      }
     },
     getDetailCard() {
       api.detailCard(this.cardId).then((response) => {
@@ -378,9 +417,6 @@ name: "Card",
     },
     cardHoverOut() {
       this.$refs.cardMore.style.display = 'none'
-    },
-    openCardAction() {
-      console.log('action')
     },
     updateDeadline() {
       let data = {
@@ -435,6 +471,83 @@ name: "Card",
     moveCard(e) {
       console.log(e)
       console.log('ok')
+    },
+    handleDeleteCard() {
+      this.$confirm('Bạn có chắc chắn muốn xóa không?', 'Cảnh báo', {
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+        confirmButtonClass: 'btn-delete-list',
+        type: 'warning'
+      }).then(() => {
+        api.deleteCard(this.card.id).then(() => {
+          this.$message({
+            message: 'Xóa thẻ thành công!',
+            type: 'success'
+          });
+          this.$emit('reload')
+        }).catch(() => {
+          this.$message({
+            message: 'Xóa thẻ thất bại!',
+            type: 'error'
+          });
+        })
+      }).catch(() => {})
+    },
+    openFromAddlabel() {
+      this.$refs.formAddLabel.style.display = 'block'
+      this.$refs.listLabel.style.display = 'none'
+    },
+    cancelFromAddlabel() {
+      this.$refs.formAddLabel.style.display = 'none'
+      this.$refs.listLabel.style.display = 'block'
+    },
+    addExitsLabel(label_id) {
+      let check = false
+      this.card.labels.forEach((label) => {
+        if(label.id === label_id) {
+          check = true
+        }
+      })
+      if (!check) {
+        let data = {
+          label_id: label_id
+        }
+        api.addLabel(this.card.id, data).then(() => {
+          this.getDetailCard()
+        })
+      } else if (check) {
+        let data = {
+          label_id: label_id
+        }
+        api.removeLabelFromCard(this.card.id, data).then(() => {
+          this.getDetailCard()
+        })
+      }
+    },
+    openFromEditlabel(labelName, labelId) {
+      this.labelNameEdit = labelName
+      this.$refs.formEditLabel.style.display = 'block'
+      this.$refs.listLabel.style.display = 'none'
+      this.labelId = labelId
+    },
+    cancelFromEditlabel() {
+      this.$refs.formEditLabel.style.display = 'none'
+      this.$refs.listLabel.style.display = 'block'
+    },
+    handleDeleteLabel(id) {
+      api.deleteLabel(id).then(() => {
+        this.getDetailCard()
+        api.getLabels().then((response) => {
+          this.labels = response.data.data
+        })
+        this.cancelFromEditlabel()
+      })
+    },
+    handleDeleteFile(id) {
+      this.deleteFilePop = false
+      api.deleteFile(id).then(() => {
+        this.getDetailCard()
+      })
     }
   },
   mounted() {
@@ -553,6 +666,7 @@ name: "Card",
       margin-bottom: 10px;
     }
     .form-add-labels {
+      display: none;
       font-family: Arial;
       .label-name {
         width: 98%;
@@ -594,6 +708,11 @@ name: "Card",
     background-color: rgba(9,30,66,.04);
     margin-bottom: 7px;
     cursor: pointer;
+    .el-date-editor {
+      opacity: 0;
+      position: absolute;
+      width: 167px;
+    }
   }
   .card-action-btn:hover {
     background-color: rgb(22 23 25 / 12%);
