@@ -111,7 +111,7 @@
                       <div class="add-labels-header">
                         Sửa tệp đính kèm
                       </div>
-                      <div class="form-add-labels">
+                      <div class="form-add-labels" style="display: block">
                         Tên liên kết
                         <br>
                         <input type="text" class="label-name" ref="inputLabel" v-model="fileName" >
@@ -186,7 +186,7 @@
               <div class="add-labels-header">
                 Thêm danh sách công việc
               </div>
-              <div class="form-add-labels">
+              <div class="form-add-labels" style="display: block">
                 Tiêu đề
                 <br>
                 <input type="text" class="label-name" v-model="checkListName">
